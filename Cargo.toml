@@ -1,0 +1,17 @@
+[package]
+name = "r_sql_database"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.51", features = ["derive"] }
+ratatui = "0.29.0"
+thiserror = "2.0.17"
+
+[[bin]]
+name = "console"
+path = "src/main.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
