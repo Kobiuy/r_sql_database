@@ -28,8 +28,9 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                         app.current_input.clear();
                     }
                     CurrentScreen::SelectField => {
-                        app.selected_fields.push(app.current_input.clone());
-                        app.current_input.clear();
+                        app.selected_fields
+                            .push(app.possibilities.remove(app.current_index));
+                        app.current_index = 0;
                     }
                     CurrentScreen::InputFieldValuePair => {
                         if app.field_or_value == FieldType::Field {
@@ -61,6 +62,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     CurrentScreen::Main
                     | CurrentScreen::SelectKeyField
                     | CurrentScreen::SelectTable
+                    | CurrentScreen::SelectField
                     | CurrentScreen::SelectCondition
                     | CurrentScreen::InputFieldTypePair => {
                         if app.current_index > 0 {
@@ -81,7 +83,14 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                         }
                     }
                     CurrentScreen::SelectTable => {
-                        if app.current_index < app.database.get_table_names().len() - 1 {
+                        if app.current_index
+                            < app.database.get_table_names().len() - app.selected_fields.len() - 1
+                        {
+                            app.current_index += 1;
+                        }
+                    }
+                    CurrentScreen::SelectField => {
+                        if app.current_index < app.possibilities.len() - 1 {
                             app.current_index += 1;
                         }
                     }
@@ -152,8 +161,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     | CurrentScreen::InputFieldValuePair
                     | CurrentScreen::SelectCondition
                     | CurrentScreen::InputFilePath
-                    | CurrentScreen::InputKeyValue
-                    | CurrentScreen::SelectField => app.current_input.push(c),
+                    | CurrentScreen::InputKeyValue => app.current_input.push(c),
                     _ => {}
                 },
                 KeyCode::Backspace => match app.current_screen {
@@ -178,7 +186,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                         app.go_to_next_page()?;
                     }
                     CurrentScreen::SelectKeyField => {
-                        if let Some(selected_key) = app.key_possibilities.get(app.current_index) {
+                        if let Some(selected_key) = app.possibilities.get(app.current_index) {
                             app.key_value = Some(selected_key.clone());
                         } else {
                             return Err(CustomError::InvalidIndex(app.current_index));
@@ -197,7 +205,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     }
                     CurrentScreen::InputFieldTypePair => {
                         app.key_value = Some(app.current_input.clone());
-                        app.key_possibilities = app
+                        app.possibilities = app
                             .generic_hashmap
                             .iter()
                             .filter(|(_, v)| **v == app.database.get_key_type())

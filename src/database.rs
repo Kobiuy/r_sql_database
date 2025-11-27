@@ -59,6 +59,17 @@ impl AnyDatabase {
             AnyDatabase::IntDatabase(_) => "Int".to_string(),
         }
     }
+    pub fn get_fields(&self, table_name: &str) -> Result<Vec<String>, CustomError> {
+        let result = match self {
+            AnyDatabase::StringDatabase(db) => {
+                db.get_table(table_name)?.fields.keys().cloned().collect()
+            }
+            AnyDatabase::IntDatabase(db) => {
+                db.get_table(table_name)?.fields.keys().cloned().collect()
+            }
+        };
+        Ok(result)
+    }
 }
 
 impl Value {
@@ -138,6 +149,11 @@ impl<K: DatabaseKey> Database<K> {
     pub fn get_table_mut(&mut self, table_name: &str) -> Result<&mut Table<K>, CustomError> {
         self.tables
             .get_mut(table_name)
+            .ok_or_else(|| CustomError::TableNotFound(table_name.to_string()))
+    }
+    pub fn get_table(&self, table_name: &str) -> Result<&Table<K>, CustomError> {
+        self.tables
+            .get(table_name)
             .ok_or_else(|| CustomError::TableNotFound(table_name.to_string()))
     }
 }

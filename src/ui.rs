@@ -8,15 +8,18 @@ use ratatui::{
 use crate::{
     app::{App, CurrentCommand, CurrentScreen, FieldType},
     condition::Op,
+    custom_error::CustomError,
     event_handler::handle_events,
 };
 
 pub fn run(terminal: &mut ratatui::DefaultTerminal, app: &mut App) -> std::io::Result<()> {
     loop {
-        terminal.draw(|frame| {
-            ui(frame, app);
-        })?;
-
+        let _ = terminal.draw(|frame| {
+            if let Err(e) = ui(frame, app) {
+                app.result = e.to_string();
+                app.current_screen = CurrentScreen::Results;
+            }
+        });
         match handle_events(app) {
             Ok(v) => {
                 if v {
@@ -25,11 +28,10 @@ pub fn run(terminal: &mut ratatui::DefaultTerminal, app: &mut App) -> std::io::R
             }
             Err(e) => app.result = e.to_string(),
         }
-        {}
     }
 }
 
-pub fn ui(frame: &mut Frame, app: &App) {
+pub fn ui(frame: &mut Frame, app: &App) -> Result<(), CustomError> {
     match app.current_screen {
         CurrentScreen::Main => {
             let items = [
@@ -97,7 +99,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
         }
         CurrentScreen::SelectKeyField => {
             let list_items: Vec<ListItem> = app
-                .key_possibilities
+                .possibilities
                 .iter()
                 .enumerate()
                 .map(|(i, text)| {
@@ -262,14 +264,22 @@ pub fn ui(frame: &mut Frame, app: &App) {
             let map_paragraph = Paragraph::new(map_contents)
                 .block(Block::default().title("Fields").borders(Borders::ALL));
 
-            let field_paragraph = Paragraph::new(app.current_input.clone()).block(
-                Block::default()
-                    .title("Field")
-                    .borders(Borders::ALL)
-                    .border_style(Style::default()),
-            );
+            let list_items: Vec<ListItem> = app
+                .possibilities
+                .iter()
+                .enumerate()
+                .map(|(i, text)| {
+                    if i == app.current_index {
+                        ListItem::new(text.clone()).style(Style::default().fg(Color::Yellow))
+                    } else {
+                        ListItem::new(text.clone()).style(Style::default().fg(Color::White))
+                    }
+                })
+                .collect();
 
-            frame.render_widget(field_paragraph, vertical_chunks[0]);
+            let list_paragraph =
+                List::new(list_items).block(Block::default().title("Fields").borders(Borders::ALL));
+            frame.render_widget(list_paragraph, vertical_chunks[0]);
             frame.render_widget(map_paragraph, vertical_chunks[1]);
         }
         CurrentScreen::SelectCondition => {
@@ -357,5 +367,6 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
             frame.render_widget(paragraph, frame.area());
         }
-    }
+    };
+    Ok(())
 }

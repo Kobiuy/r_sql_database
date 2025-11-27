@@ -68,7 +68,7 @@ pub struct App {
 
     pub field_or_value: FieldType,
     pub current_index: usize,
-    pub key_possibilities: Vec<String>,
+    pub possibilities: Vec<String>,
 
     pub result: String,
 }
@@ -99,7 +99,7 @@ impl App {
             field_or_value: FieldType::Field,
             input_field: None,
             input_value: None,
-            key_possibilities: Vec::new(),
+            possibilities: Vec::new(),
             result: String::new(),
         }
     }
@@ -178,6 +178,11 @@ impl App {
                 self.current_screen = CurrentScreen::Results;
             }
             (CurrentCommand::Select, CurrentScreen::SelectTable) => {
+                let selected_table_name = match &self.input_table_name {
+                    Some(v) => v,
+                    None => return Err(CustomError::TableNameNotPresent()),
+                };
+                self.possibilities = self.database.get_fields(&selected_table_name)?;
                 self.current_screen = CurrentScreen::SelectField;
             }
             (CurrentCommand::Select, CurrentScreen::SelectField) => {

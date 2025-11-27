@@ -46,4 +46,6 @@ pub enum CustomError {
     InvalidIndex(usize),
     #[error("Invalid Key Type")]
     WrongKeyType(),
+    #[error("Table Name not present")]
+    TableNameNotPresent(),
 }
