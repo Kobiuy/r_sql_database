@@ -271,11 +271,11 @@ impl<K: DatabaseKey> Table<K> {
     }
     pub fn select_records(
         &mut self,
-        fields: &Vec<String>,
+        fields: &[String],
         conditions_str: &Option<String>,
     ) -> Result<Vec<Record>, CustomError> {
         let cond = match conditions_str {
-            Some(s) => Some(parse_conditions(&s, &self.fields)?),
+            Some(s) => Some(parse_conditions(s, &self.fields)?),
             None => None,
         };
 

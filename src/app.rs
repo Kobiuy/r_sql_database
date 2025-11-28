@@ -182,7 +182,7 @@ impl App {
                     Some(v) => v,
                     None => return Err(CustomError::TableNameNotPresent()),
                 };
-                self.possibilities = self.database.get_fields(&selected_table_name)?;
+                self.possibilities = self.database.get_fields(selected_table_name)?;
                 self.current_screen = CurrentScreen::SelectField;
             }
             (CurrentCommand::Select, CurrentScreen::SelectField) => {
