@@ -221,10 +221,7 @@ impl<'a, K: DatabaseKey> Command for Delete<'a, K> {
 }
 impl<'a, K: DatabaseKey> Command for Select<'a, K> {
     fn execute(&mut self) -> Result<String, CustomError> {
-        match self
-            .table
-            .select_records(self.fields.clone(), self.cond_string.clone())
-        {
+        match self.table.select_records(&self.fields, &self.cond_string) {
             Ok(v) => {
                 let result = v
                     .iter()
@@ -240,7 +237,7 @@ impl<'a, K: DatabaseKey> Command for Select<'a, K> {
 
 impl<'a> Command for SaveAs<'a> {
     fn execute(&mut self) -> Result<String, CustomError> {
-        let mut file = File::create(self.file_path.clone()).map_err(CustomError::IoError)?;
+        let mut file = File::create(&self.file_path).map_err(CustomError::IoError)?;
         for entry in self.history.list() {
             match writeln!(file, "{}", entry) {
                 Ok(_) => {}
@@ -253,7 +250,7 @@ impl<'a> Command for SaveAs<'a> {
 
 impl<'a, K: DatabaseKey> Command for ReadFrom<'a, K> {
     fn execute(&mut self) -> Result<String, CustomError> {
-        let file = File::open(self.file_path.clone()).map_err(CustomError::IoError)?;
+        let file = File::open(&self.file_path).map_err(CustomError::IoError)?;
 
         let reader = std::io::BufReader::new(file);
 

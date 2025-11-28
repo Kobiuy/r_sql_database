@@ -88,7 +88,7 @@ impl Value {
     pub fn as_string(&self) -> String {
         match self {
             Value::Bool(b) => b.to_string(),
-            Value::String(s) => s.clone(),
+            Value::String(s) => s.to_string(),
             Value::Int(i) => i.to_string(),
             Value::Float(f) => f.to_string(),
         }
@@ -142,7 +142,7 @@ impl<K: DatabaseKey> Database<K> {
             return Err(CustomError::WrongKeyType());
         }
 
-        let table = Table::new(name.clone(), key_field, fields);
+        let table = Table::new(&name, key_field, fields);
         self.tables.insert(name, table);
         Ok(())
     }
@@ -167,7 +167,7 @@ impl DatabaseKey for String {
     }
     fn from_value(v: &Value) -> Result<Self, CustomError> {
         match v {
-            Value::String(s) => Ok(s.clone()),
+            Value::String(s) => Ok(s.to_string()),
             _ => Err(CustomError::ValueParseError(v.as_string())),
         }
     }
@@ -200,9 +200,9 @@ impl DatabaseKey for i64 {
     }
 }
 impl<K: DatabaseKey> Table<K> {
-    fn new(table_name: String, key_field: String, fields: HashMap<String, String>) -> Self {
+    fn new(table_name: &str, key_field: String, fields: HashMap<String, String>) -> Self {
         Self {
-            table_name,
+            table_name: table_name.to_string(),
             key_field,
             fields,
             records: BTreeMap::new(),
@@ -271,8 +271,8 @@ impl<K: DatabaseKey> Table<K> {
     }
     pub fn select_records(
         &mut self,
-        fields: Vec<String>,
-        conditions_str: Option<String>,
+        fields: &Vec<String>,
+        conditions_str: &Option<String>,
     ) -> Result<Vec<Record>, CustomError> {
         let cond = match conditions_str {
             Some(s) => Some(parse_conditions(&s, &self.fields)?),
@@ -298,7 +298,7 @@ impl<K: DatabaseKey> Table<K> {
                     .values
                     .iter()
                     .filter(|(k, _v)| fields.contains(&k.to_string_2()))
-                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .map(|(k, v)| (k.to_string(), v.clone()))
                     .collect();
                 r2
             })

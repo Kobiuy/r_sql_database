@@ -24,7 +24,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                             };
 
                         app.generic_hashmap
-                            .insert(app.current_input.clone(), field_type);
+                            .insert(app.current_input.to_string(), field_type);
                         app.current_input.clear();
                     }
                     CurrentScreen::SelectField => {
@@ -34,19 +34,19 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     }
                     CurrentScreen::InputFieldValuePair => {
                         if app.field_or_value == FieldType::Field {
-                            app.input_field = Some(app.current_input.clone());
+                            app.input_field = Some(app.current_input.to_string());
                         } else if app.field_or_value == FieldType::Value {
-                            app.input_value = Some(app.current_input.clone());
+                            app.input_value = Some(app.current_input.to_string());
                         }
                         let field = match &app.input_field {
-                            Some(v) => v.clone(),
+                            Some(v) => v.to_string(),
                             None => {
                                 return Err(CustomError::MissingField("field".to_string()));
                             }
                         };
 
                         let field_type = match &app.input_value {
-                            Some(v) => v.clone(),
+                            Some(v) => v.to_string(),
                             None => {
                                 return Err(CustomError::MissingField("type".to_string()));
                             }
@@ -110,9 +110,9 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     CurrentScreen::InputFieldValuePair => {
                         if app.field_or_value == FieldType::Field {
                             app.field_or_value = FieldType::Value;
-                            app.input_field = Some(app.current_input.clone());
+                            app.input_field = Some(app.current_input.to_string());
                             app.current_input = match &app.input_value {
-                                Some(v) => v.clone(),
+                                Some(v) => v.to_string(),
                                 None => "".to_string(),
                             }
                         }
@@ -120,7 +120,7 @@ pub fn handle_events(app: &mut App) -> Result<bool, CustomError> {
                     CurrentScreen::SelectCondition => {
                         if app.field_or_value == FieldType::Field {
                             app.field_or_value = FieldType::Value;
-                            app.condition_field = Some(app.current_input.clone());
+                            app.condition_field = Some(app.current_input.to_string());
                             app.current_input = match &app.condition_value {
                                 Some(v) => v.clone(),
                                 None => "".to_string(),

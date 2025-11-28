@@ -148,7 +148,7 @@ impl App {
                 let input = format!("CREATE {table} KEY {key} FIELDS {fields}");
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
@@ -172,7 +172,7 @@ impl App {
                 let input = format!("INSERT {fields} INTO {table}");
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
@@ -196,8 +196,8 @@ impl App {
                     None => "",
                 };
                 let c0 = match &self.condition_field {
-                    Some(f) => f.clone(),
-                    None => "".to_string(),
+                    Some(f) => f,
+                    None => "",
                 };
 
                 let c1 = match &self.selected_condition {
@@ -206,8 +206,8 @@ impl App {
                 };
 
                 let c2 = match &self.condition_value {
-                    Some(v) => v.clone(),
-                    None => "".to_string(),
+                    Some(v) => v,
+                    None => "",
                 };
 
                 let mut input = format!("SELECT {} FROM {}", fields, table);
@@ -217,7 +217,7 @@ impl App {
                 }
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
@@ -231,13 +231,13 @@ impl App {
                     None => "",
                 };
                 let key = match &self.key_value {
-                    Some(f) => f.clone(),
-                    None => "".to_string(),
+                    Some(f) => f,
+                    None => "",
                 };
                 let input = format!("DELETE {} FROM {}", key, table);
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
@@ -250,7 +250,7 @@ impl App {
                 let input = format!("SAVE_AS {} ", path);
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
@@ -263,7 +263,7 @@ impl App {
                 let input = format!("READ_FROM {} ", path);
 
                 match handle_input_any_db(input, &mut self.database, &mut self.history) {
-                    Ok(res) => self.result = res.clone(),
+                    Ok(res) => self.result = res,
                     Err(e) => self.result = e.to_string(),
                 }
                 self.current_screen = CurrentScreen::Results;
